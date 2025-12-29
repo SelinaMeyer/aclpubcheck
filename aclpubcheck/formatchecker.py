@@ -91,6 +91,7 @@ class Formatter(object):
             self.check_references()
 
         if check_github_links:
+            print("checking github liunks")
             self.check_github_links(submission)
         # TODO: put json dump back on
         output_file = "errors-{0}.json".format(self.number)
@@ -111,6 +112,9 @@ class Formatter(object):
                         errors += 1
                     elif e == Error.PARSING:
                         print(colored("Parsing Error:".format(e.value), "yellow")+" "+m)
+
+                    elif e==Error.REPOSITORY:
+                        print(colored("Link Error:".format(e.value), "yellow")+" "+m)
                     else:
                         print(colored("Warning ({0}):".format(e.value), "yellow")+" "+m)
                         warnings += 1
@@ -586,6 +590,7 @@ class Formatter(object):
             if res in ["404", 0, 1, "empty"]:
                 error = f"""Paper id: {self.number} - A refreenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}
                             Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""
+                print(error)
                 self.logs[Error.REPOSITORY] = error
 
 
