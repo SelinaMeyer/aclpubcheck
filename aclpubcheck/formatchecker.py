@@ -73,7 +73,6 @@ class Formatter(object):
         Return True if the paper is correct, False otherwise.
         """
         print(f"Checking {submission}")
-        print(f"{check_github_links}")
 
         # TOOD: make this less of a hack
         self.number = submission.split("/")[-1].split("_")[0].replace(".pdf", "")
@@ -520,7 +519,7 @@ class Formatter(object):
             repo = repo[1]
             print(repo)
             repo = re.sub(r"\.git$", "", repo)
-            repo.strip("/")
+            repo = repo.strip("/")
             print(repo)
             parts = repo.split("/")
             if len(parts) == 2:
