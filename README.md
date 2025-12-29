@@ -1,6 +1,6 @@
 # ACL pubcheck
 
-**This is an extension of ACL pubcheck, which checks the availability of linked GitHUb repositories. The extension is introduced in ``Papers Without Code: Placeholder Repositories and Availability Issues in ACL Papers``. The Readme of the original ACL pubcheck repository is included for completeness, with adaptations marked in boldface.**
+**This is an extension of ACL pubcheck, which checks the availability of linked GitHUb repositories. The Readme of the original ACL pubcheck repository is included for completeness, with adaptations marked in boldface.**
 
 ACL pubcheck is a Python tool that automatically detects font errors, author formatting errors, margin violations, outdated citations as well as many other common formatting errors in papers that are using the LaTeX sty file associated with ACL venues. The script can be used to check your papers before you submit to a conference. (We highly recommend running ACL pubcheck on your papers *pre-submission*&mdash;a well formatted paper helps keep the reviewers focused on the scientific content.) However, its main purpose is to ensure your accepted paper is properly formatted, i.e., it follows the venue's style guidelines. The script is used by the publication chairs at most ACL events to check for formatting issues. Indeed, running this script yourself and fixing errors before uploading the camera-ready version of your paper will often save you a personalized email from the publication chairs.
 
@@ -9,21 +9,21 @@ ACL pubcheck is a Python tool that automatically detects font errors, author for
 The simplest way to use `aclpubcheck` is with the [`uv`](https://docs.astral.sh/uv/) package manager. Install `uv` following [the guide](https://docs.astral.sh/uv/getting-started/installation/), and you can then install and run `aclpubcheck` with a one-liner. **To run the adapted version and check linked GitHub repositories as well as formatting, make sure you provide a GitHub API key in the .env file and run:**
 
 ```bash
-uvx --from git+https://github.com/SelinaMeyer/aclpubcheck aclpubcheck --paper_type PAPER_TYPE --check_github_links /path/to/paper.pdf
+uvx --from git+https://github.com/***/aclpubcheck aclpubcheck --paper_type PAPER_TYPE --check_github_links /path/to/paper.pdf
 ```
 
 You can also install using `pip` directly from the GitHub repository (DIFFERENT from `pypi`):
 
 ```bash
-pip3 install git+https://github.com/SelinaMeyer/aclpubcheck
+pip3 install git+https://github.com/***/aclpubcheck
 ```
 
 Alternatively, you can install directly from source and build locally:
 ```bash
 # clone using ssh
-git clone git@github.com:SelinaMeyer/aclpubcheck.git
+git clone git@github.com:***/aclpubcheck.git
 # or http
-git clone https://github.com/SelinaMeyer/aclpubcheck.git
+git clone https://github.com/***/aclpubcheck.git
 
 cd aclpubcheck/
 
@@ -63,7 +63,7 @@ ACL pubcheck is meant to be run on the camera ready version of the paper, not on
 Typically, the space at the bottom of a paper should be left empty, as page numbers will be added during the watermarking process of the proceedings. By default, ACL pubcheck ensures that a margin of approximately 2 cm at the bottom of each page is left blank. If any text is detected in this area, such as page numbers mistakenly added, a warning is generated. However, if this area must contain information, or if you need to bypass this check for any reason, you can disable it by using the parameter `--disable_bottom_check`.
 
 
-## Online Versions (Does not include GitHUb Check functionality)
+## Online Versions (Does not include GitHub Check)
 
 If you are having trouble with installing and using the Python toolkit directly, you can use:
 - a [**Colab version** you can use to directly upload and run aclpubcheck](https://colab.research.google.com/github/acl-org/aclpubcheck/blob/main/aclpubcheck_online.ipynb) without local installation (thank Danilo Croce).
