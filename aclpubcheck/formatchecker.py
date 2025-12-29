@@ -91,7 +91,6 @@ class Formatter(object):
             self.check_references()
 
         if check_github_links:
-            print("checking github links")
             self.check_github_links()
         # TODO: put json dump back on
         output_file = "errors-{0}.json".format(self.number)
@@ -561,6 +560,7 @@ class Formatter(object):
         Returns:
             Cleaned, de-duplicated list of GitHub URLs found in the PDF.
         """
+        print("checking github links")
 
         extracted_links = []
         
@@ -588,9 +588,8 @@ class Formatter(object):
         for url in clean:
             res = self.get_github_data(url)
             if res in ["404", 0, 1, "empty"]:
-                error = f"""Paper id: {self.number} - A refreenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}
-                            Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""
-                print(error)
+                error = [f"""Paper id: {self.number} - A referenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}
+                            Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""]
                 self.logs[Error.REPOSITORY] = error
 
 
