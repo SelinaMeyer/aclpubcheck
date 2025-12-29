@@ -513,13 +513,10 @@ class Formatter(object):
         else:
             repo = parts[0]
         try: 
-            print(repo)
             repo = repo.split("github.com/")
             repo = repo[1]
-            print(repo)
             repo = re.sub(r"\.git$", "", repo)
             repo = repo.strip("/")
-            print(repo)
             parts = repo.split("/")
             if len(parts) == 2:
                 try:
@@ -588,9 +585,9 @@ class Formatter(object):
         for url in clean:
             res = self.get_github_data(url)
             if res in ["404", 0, 1, "empty"]:
-                error = [f"""Paper id: {self.number} - A referenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}
-                            Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""]
+                error = [f"""Paper id: {self.number} - A referenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}. Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""]
                 self.logs[Error.REPOSITORY] = error
+                print(f"Found broken GitHub link: {url}")
 
 
 args = None
