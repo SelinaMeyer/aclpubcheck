@@ -611,7 +611,7 @@ def main():
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--disable_name_check', action='store_false')
     parser.add_argument('--disable_bottom_check', action='store_false')
-    parser.add_argument('--check_github_links', action='store_false')
+    parser.add_argument('--check_github_links', action=argparse.BooleanOptionalAction. default=False)
 
 
     args = parser.parse_args()
