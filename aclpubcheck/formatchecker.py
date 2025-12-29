@@ -91,7 +91,7 @@ class Formatter(object):
             self.check_references()
 
         if check_github_links:
-            print("checking github liunks")
+            print("checking github links")
             self.check_github_links(submission)
         # TODO: put json dump back on
         output_file = "errors-{0}.json".format(self.number)
@@ -595,9 +595,9 @@ class Formatter(object):
 
 
 args = None
-def worker(pdf_path, paper_type):
+def worker(pdf_path, paper_type, check_github_links):
     """ process one pdf """
-    return Formatter().format_check(submission=pdf_path, paper_type=paper_type)
+    return Formatter().format_check(submission=pdf_path, paper_type=paper_type, check_github_links=check_github_links)
 
 
 def main():
@@ -637,7 +637,7 @@ def main():
         # TODO: make the tqdm togglable
         #for submission in tqdm(fileset):
         for submission in fileset:
-            worker(submission, args.paper_type)
+            worker(submission, args.paper_type, args.check_github_links)
 
 if __name__ == "__main__":
     main()
