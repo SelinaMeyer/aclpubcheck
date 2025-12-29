@@ -506,7 +506,6 @@ class Formatter(object):
         g = Github(auth=auth)
         if isinstance(link, (bytes, bytearray)):
             link = link.decode("utf-8", errors="ignore")
-        print(link)
         parts = re.split(r'https?://', link, maxsplit=1)
         if len(parts) > 1:
             repo = parts[1]
@@ -532,10 +531,8 @@ class Formatter(object):
                         num_files_in_repo = "empty"
 
                 except UnknownObjectException as e:
-                    print("Repo does not exist")
                     num_files_in_repo = "404"
             else:
-                print(f"link is not a repo: {repo}")
                 num_files_in_repo = "not a repo"
         except Exception as e:
             num_files_in_repo = 0
