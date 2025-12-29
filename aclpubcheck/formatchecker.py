@@ -93,7 +93,7 @@ class Formatter(object):
 
         if check_github_links:
             print("checking github links")
-            self.check_github_links(submission)
+            self.check_github_links()
         # TODO: put json dump back on
         output_file = "errors-{0}.json".format(self.number)
         # string conversion for json dump
