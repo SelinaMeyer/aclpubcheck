@@ -4,3 +4,4 @@ dist/*.egg
 dist/*.tar.gz
 build/
 */__pycache__
+.env

@@ -11,7 +11,10 @@ install_requires = [
 	"pylatexenc",
 	"setuptools",
 	"Unidecode",
-	"tsv"
+	"tsv",
+    "PyMuPDF==1.26.6",
+    "PyGithub==2.8.1",
+    "regex"
 ]
 
 

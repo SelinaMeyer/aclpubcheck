@@ -15,6 +15,10 @@ from termcolor import colored
 import os
 import numpy as np
 import traceback
+from github import Github, Auth
+from github.GithubException import GithubException, UnknownObjectException
+import re
+import fitz
 
 from .name_check import PDFNameCheck
 
@@ -26,6 +30,7 @@ class Error(Enum):
     SPELLING = "Spelling"
     FONT = "Font"
     PAGELIMIT = "Page Limit"
+    REPOSITORY = "Broken Repository Link"
 
 
 class Warn(Enum):
@@ -63,7 +68,7 @@ class Formatter(object):
         self.pdf_namecheck = PDFNameCheck()
 
 
-    def format_check(self, submission, paper_type, output_dir = ".", print_only_errors = False, check_references = False):
+    def format_check(self, submission, paper_type, output_dir = ".", print_only_errors = False, check_references = False, check_github_links=False):
         """
         Return True if the paper is correct, False otherwise.
         """
@@ -85,6 +90,8 @@ class Formatter(object):
         if check_references:
             self.check_references()
 
+        if check_github_links:
+            self.check_github_links(submission)
         # TODO: put json dump back on
         output_file = "errors-{0}.json".format(self.number)
         # string conversion for json dump
@@ -482,6 +489,106 @@ class Formatter(object):
             self.logs[Warn.BIB] += ["Couldn't find any references."]
 
 
+
+    def get_github_data(self,link):
+        """Normalize a GitHub link and fetch shallow repo info via the GitHub API.
+
+        Args:
+            link: Full GitHub URL (or bytes) pointing to a repository.
+
+        Returns:
+            Tuple of (count of top-level entries or error flag, list/flag of entries, README text or fallback).
+        """
+        auth = Auth.Token(os.getenv("github_token"))
+        g = Github(auth=auth)
+        if isinstance(link, (bytes, bytearray)):
+            link = link.decode("utf-8", errors="ignore")
+        print(link)
+        parts = re.split(r'https?://', link, maxsplit=1)
+        if len(parts) > 1:
+            repo = parts[1]
+        else:
+            repo = parts[0]
+        try: 
+            print(repo)
+            repo = repo.split("github.com/")
+            repo = repo[1]
+            print(repo)
+            repo = re.sub(r"\.git$", "", repo)
+            repo.strip("/")
+            print(repo)
+            parts = repo.split("/")
+            if len(parts) == 2:
+                try:
+                    github_repo = g.get_repo(repo)
+                    try:
+                        contents = github_repo.get_contents("")
+                        num_files_in_repo = len(contents)
+                        files_in_repo = contents
+                        print("Files in repo: ", files_in_repo)
+
+                    except UnknownObjectException as e:
+                        print("Repo is empty")
+                        num_files_in_repo = "empty"
+
+                except UnknownObjectException as e:
+                    print("Repo does not exist")
+                    num_files_in_repo = "404"
+            else:
+                print(f"link is not a repo: {repo}")
+                num_files_in_repo = "not a repo"
+        except Exception as e:
+            num_files_in_repo = 0
+            print(e)
+
+        return num_files_in_repo
+    
+
+    def check_github_links(self):
+        """Extract GitHub URLs from a paper PDF by scanning text and link annotations.
+
+        Code to extract links adapted from https://thepythoncode.com/article/extract-pdf-links-with-python
+
+        Args:
+            event_name: ACL event slug used for file path resolution.
+            volume: Volume title for the paper.
+            paper_id: Full paper id (matches stored PDF filename).
+
+        Returns:
+            Cleaned, de-duplicated list of GitHub URLs found in the PDF.
+        """
+
+        extracted_links = []
+        
+        url_regex = r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=\n]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
+
+        with fitz.open(self.pdfpath) as pdf:
+            for page in pdf:
+                # extract text of each PDF page
+                text = page.get_text()
+                # extract all urls using the regular expression
+                for match in re.finditer(url_regex, text):
+                    url = match.group()
+                    if "github.com" in url.lower():
+                        url = url.strip(".,")
+                        extracted_links.append(url)
+                links = page.get_links()
+                for link in links:
+                    uri = link.get("uri")
+                    if uri and "github.com" in uri.lower():
+                        extracted_links.append(uri)  
+
+        urls = sorted(set(extracted_links), key=len) 
+        clean = [u for i, u in enumerate(urls) if not any(u in v for v in urls[i+1:])] # drop broken duplicates from stitched canvas strings
+
+        for url in clean:
+            res = self.get_github_data(url)
+            if res in ["404", 0, 1, "empty"]:
+                error = f"""Paper id: {self.number} - A refreenced github repository seems to be unavailable, contains very few files or is not properly linked: {url}
+                            Please make sure the repository is available, contains all necessary files and is properly embedded as a url."""
+                self.logs[Error.REPOSITORY] = error
+
+
 args = None
 def worker(pdf_path, paper_type):
     """ process one pdf """
@@ -498,6 +605,7 @@ def main():
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--disable_name_check', action='store_false')
     parser.add_argument('--disable_bottom_check', action='store_false')
+    parser.add_argument('--check_github_links', action='store_false')
 
 
     args = parser.parse_args()
