@@ -73,6 +73,7 @@ class Formatter(object):
         Return True if the paper is correct, False otherwise.
         """
         print(f"Checking {submission}")
+        print(f"{check_github_links}")
 
         # TOOD: make this less of a hack
         self.number = submission.split("/")[-1].split("_")[0].replace(".pdf", "")
